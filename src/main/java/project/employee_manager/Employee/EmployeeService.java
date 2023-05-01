@@ -1,6 +1,11 @@
 package project.employee_manager.Employee;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import project.employee_manager.Exception.BadRequestException;
@@ -11,8 +16,17 @@ public class EmployeeService {
     @Autowired
     private EmployeeRepository employeeRepository;
 
-    public Iterable<Employee> findAll() {
-        return employeeRepository.findAll();
+    public Page<Employee> findAll(int page, int size, String position) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "firstName", "lastName"));
+
+        Specification<Employee> spec = Specification.where(null);
+        if (position != null && !position.isBlank()) {
+            spec = spec.and(
+                    (root, query, criteriaBuilder) -> criteriaBuilder.like(root.get("position"),
+                            "%" + position + "%"));
+        }
+
+        return employeeRepository.findAll(spec, pageable);
     }
 
     public Employee findById(Long id) {

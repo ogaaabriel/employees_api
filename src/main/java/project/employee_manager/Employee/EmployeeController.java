@@ -1,6 +1,7 @@
 package project.employee_manager.Employee;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
@@ -23,8 +25,9 @@ public class EmployeeController {
     EmployeeService employeeService;
 
     @GetMapping()
-    public Iterable<Employee> getAllEmployees() {
-        return employeeService.findAll();
+    public Page<Employee> getAllEmployees(@RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size, @RequestParam(required = false) String position) {
+        return employeeService.findAll(page, size, position);
     }
 
     @GetMapping("/{id}")
